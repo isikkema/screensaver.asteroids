@@ -60,9 +60,7 @@ public:
   CVector2        m_LineVel[ASTEROIDNUMLINES];
   f32             m_LineRot[ASTEROIDNUMLINES];
 
-protected:
   CVector2        m_Vel;
-
 };
 
 /***************************** I N L I N E S *******************************/
