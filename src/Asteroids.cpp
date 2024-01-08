@@ -138,7 +138,7 @@ void CAsteroids::ShipAI(f32 dt)
       time = posDiff.y / bulletVel.y;
     }
 
-    asteroidPos += asteroid->m_Vel * time;
+    asteroidPos += asteroid->m_Vel * abs(time);
   }
 
   CVector2 dir = Normalized(m_Ship.m_Pos - asteroidPos);
