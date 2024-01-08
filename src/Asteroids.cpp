@@ -124,16 +124,25 @@ void CAsteroids::ShipAI(f32 dt)
     return;
 
   CAsteroid *asteroid = &m_Asteroids[closestIndex];
+  
+  CVector2 asteroidPos = asteroid->m_Pos;
   f32 time;
-  CVector2 posDiff = asteroid->m_Pos - m_Ship.m_Pos;
-  CVector2 bulletVel = Normalized(posDiff) * 200.0f;
-  if (posDiff.x > posDiff.y) {
-    time = posDiff.x / bulletVel.x;
-  } else {
-    time = posDiff.y / bulletVel.y;
+  CVector2 posDiff;
+  CVector2 bulletVel;
+  for (int i = 0; i < 2; i++) {
+    posDiff = asteroidPos - m_Ship.m_Pos;
+    bulletVel = Normalized(posDiff) * 200.0f;
+    if (posDiff.x > posDiff.y) {
+      time = posDiff.x / bulletVel.x;
+    } else {
+      time = posDiff.y / bulletVel.y;
+    }
+
+    asteroidPos += asteroid->m_Vel * time;
   }
 
-  CVector2 dir = Normalized(m_Ship.m_Pos - (asteroid->m_Pos + asteroid->m_Vel * time));
+  CVector2 dir = Normalized(m_Ship.m_Pos - asteroidPos);
+  
   f32 backOrFront = DotProduct(dir, m_Ship.GetDirVec());
   f32 leftOrRight = DotProduct(dir, m_Ship.GetTangDirVec());
   if (backOrFront >= 0.99 && backOrFront <= 1.01 && m_Ship.CanFire() && distMin < SQR(200.0f))
