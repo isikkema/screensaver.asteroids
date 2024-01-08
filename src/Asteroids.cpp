@@ -129,7 +129,7 @@ void CAsteroids::ShipAI(f32 dt)
   f32 time;
   CVector2 posDiff;
   CVector2 bulletVel;
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 10; i++) {
     posDiff = asteroidPos - m_Ship.m_Pos;
     bulletVel = Normalized(posDiff) * 200.0f;
     if (posDiff.x > posDiff.y) {
