@@ -124,27 +124,54 @@ void CAsteroids::ShipAI(f32 dt)
     return;
 
   CAsteroid *asteroid = &m_Asteroids[closestIndex];
-  
-  CVector2 asteroidPos = asteroid->m_Pos;
-  f32 time;
-  CVector2 posDiff;
-  CVector2 bulletVel;
-  for (int i = 0; i < 10; i++) {
-    posDiff = asteroidPos - m_Ship.m_Pos;
-    bulletVel = Normalized(posDiff) * 200.0f;
-    if (posDiff.x > posDiff.y) {
-      time = posDiff.x / bulletVel.x;
-    } else {
-      time = posDiff.y / bulletVel.y;
-    }
 
-    asteroidPos += asteroid->m_Vel * abs(time);
+  CVector2 asteroidPos;
+  CVector2 posDiff = asteroid->m_Pos - m_Ship.m_Pos;
+  f32 numerator = DotProduct(asteroid->m_Vel, posDiff);
+  f32 denominator;
+  CVector2 delta;
+  CVector2 *dir = NULL;
+  if (numerator < 0)
+  {
+    denominator = sqrt(SquareMagnitude(asteroid->m_Vel) * SquareMagnitude(posDiff));
+    delta = posDiff * -numerator / denominator;
+    asteroidPos = asteroid->m_Pos + delta;
+    posDiff = m_Ship.m_Pos - asteroidPos;
+
+    if (SquareMagnitude(posDiff) < SQR(200.0f))
+    {
+      dir = new CVector2;
+      *dir = Normalized(posDiff);
+    }
   }
 
-  CVector2 dir = Normalized(m_Ship.m_Pos - asteroidPos);
-  
-  f32 backOrFront = DotProduct(dir, m_Ship.GetDirVec());
-  f32 leftOrRight = DotProduct(dir, m_Ship.GetTangDirVec());
+  f32 time;
+  CVector2 bulletVel;
+  if (dir == NULL)
+  {
+    asteroidPos = asteroid->m_Pos;
+    for (int i = 0; i < 3; i++)
+    {
+      posDiff = asteroidPos - m_Ship.m_Pos;
+      bulletVel = Normalized(posDiff) * 200.0f;
+      if (posDiff.x > posDiff.y)
+      {
+        time = posDiff.x / bulletVel.x;
+      }
+      else
+      {
+        time = posDiff.y / bulletVel.y;
+      }
+
+      asteroidPos += asteroid->m_Vel * abs(time);
+    }
+
+    dir = new CVector2;
+    *dir = Normalized(m_Ship.m_Pos - asteroidPos);
+  }
+
+  f32 backOrFront = DotProduct(*dir, m_Ship.GetDirVec());
+  f32 leftOrRight = DotProduct(*dir, m_Ship.GetTangDirVec());
   if (backOrFront >= 0.99 && backOrFront <= 1.01 && m_Ship.CanFire() && distMin < SQR(200.0f))
   {
     // We are aimed correctly so shoot
